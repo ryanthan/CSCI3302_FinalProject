@@ -3,8 +3,8 @@ WorldInfo {
   coordinateSystem "NUE"
 }
 Viewpoint {
-  orientation -0.9791964881390623 0.18651518436369138 0.07991447689815173 0.7404758823454102
-  position 0.35304825855853667 1.770551718210857 1.9532506575047683
+  orientation -1 0 0 1.54185145210728
+  position 0.008229544605488304 3.365488350085899 -0.024200704238388594
 }
 TexturedBackground {
 }
@@ -38,7 +38,7 @@ Solid {
   boundingObject USE SAFE_PLATFORM
 }
 DEF Goal Solid {
-  translation 0.165756 0.0399361 0.178471
+  translation 0.0357556 0.0399361 0.218471
   rotation 0 1 0 -5.307179586466759e-06
   scale 0.1 0.1 0.1
   children [
@@ -91,7 +91,7 @@ Solid {
       }
     }
   ]
-  name "top_wall"
+  name "TOP_WALL"
   boundingObject USE TOP_WALL
 }
 Solid {
@@ -227,4 +227,18 @@ Solid {
   ]
   name "wall9"
   boundingObject USE WALL9
+}
+DEF EPUCK E-puck {
+  translation -0.46 -2.98829e-05 0.38
+  rotation 0 1 0 1.0150305250839343e-06
+  controller "FinalProject_base"
+  supervisor TRUE
+  turretSlot [
+    FinalProjectLds01 {
+    }
+  ]
+  groundSensorsSlot [
+    E-puckGroundSensors {
+    }
+  ]
 }
