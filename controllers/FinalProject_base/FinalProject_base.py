@@ -41,7 +41,7 @@ pose_theta_2 = 0
 
 left_wheel_direction = 0
 right_wheel_direction = 0
-EPUCK_MAX_WHEEL_SPEED = 0.12880519 * 4.0
+EPUCK_MAX_WHEEL_SPEED = 0.12880519 * 10.0
 EPUCK_AXLE_DIAMETER = 0.053 # mm; from lab 4
 OBJECT_AVOIDANCE = 0.1 
 
@@ -138,8 +138,10 @@ def display_map(m):
     print("")
     robot_pos = transform_world_coord_to_map_coord([pose_x_2,pose_y_2])
     goal_pos = transform_world_coord_to_map_coord([goal_pose[0],goal_pose[1]])
-    world_map[goal_pos[0],goal_pos[1]] = 3
-    world_map[robot_pos[0],robot_pos[1]] = 4
+    
+    if state != 'get_path': #Kept getting an error with these lines when using Dijkstra's so I had to add this if statement
+        world_map[goal_pos[0],goal_pos[1]] = 3
+        world_map[robot_pos[0],robot_pos[1]] = 4
     for row in range(NUM_Y_CELLS-1,-1,-1):
         for col in range(NUM_X_CELLS):
             if(world_map[row,col] == 1): # Checking for a wall
@@ -152,13 +154,108 @@ def display_map(m):
                 print("[R]", end = '')
             elif(world_map[row,col] == 5): # Previous robot path/track
                 print("[o]", end = '')
+            elif(world_map[row,col] == 6): # Path to goal (from Dijkstra's)
+                print("[+]", end = '')
             else:
                 print("[ ]", end = '') # Unknown or empty
         print("")
     for col in range(NUM_X_CELLS):
         print("---", end = '')
     print("")
-    world_map[robot_pos[0],robot_pos[1]] = 5
+    
+    if state != 'get_path':
+        world_map[robot_pos[0],robot_pos[1]] = 5
+    
+
+# Dijkstra's Path Finding (from lab 5)
+#########################################################################################################
+def get_travel_cost(source_vertex, dest_vertex):
+    global world_map
+    
+    #Get the i, j coordinates of both cells
+    i_source = source_vertex[0]
+    j_source = source_vertex[1]
+    
+    i_dest = dest_vertex[0]
+    j_dest = dest_vertex[1]
+    
+    distance = abs(i_source - i_dest) + abs(j_source - j_dest) #Calculate the distance between cells
+    
+    #If the source or destination cell is occupied OR the two cells are NOT neighbors:
+    if (world_map[i_source][j_source] == 1 or world_map[i_dest][j_dest] == 1 or distance > 1):
+        cost = 1e5 #Return a high cost
+    #If the source and destination cell are the same:
+    elif (i_source == i_dest and j_source == j_dest):
+        cost = 0 #Return 0
+    #If the source and destination are neighbors:
+    elif (distance == 1):
+        cost = 1 #Return 1
+    return cost 
+    
+    
+def dijkstra(source_vertex):
+    global world_map
+    
+    source_vertex = tuple(source_vertex) # Make it a tuple so you can index into numpy arrays and dictionaries with it
+
+    #Initialize Dijkstra variables
+    dist = np.full_like(world_map, math.inf) #Create a matrix the same size as world_map with a large value
+    dist[source_vertex] = 0 #Set the source vertex cost value to zero
+    q_cost = [] #This is how many nodes we have left to visit
+    prev = {} #Dictionary to map tuples to each other
+
+    q_cost.append((source_vertex, 0)) #Initialize q_cost with (source_vertex, 0)
+
+    #While q_cost is not empty:
+    while(robot.step(timestep) != -1 and q_cost):
+        q_cost.sort(key=lambda x:x[1]) #Sort q_cost by cost
+        u = q_cost[0][0] #Get the vertex with the smallest value
+        q_cost = q_cost[1:] #Remove the smallest value from the array
+        
+        neighbors = [(u[0], u[1] + 1), (u[0] + 1, u[1]), (u[0], u[1] - 1), (u[0] - 1, u[1])] #Set the neighbors of vertex u
+        
+        for v in neighbors: #Loop through each neighbor
+            if (v[0] < 0 or v[1] < 0 or v[0] >= len(world_map) or v[1] >= len(world_map)): #Ignore invalid cells
+                pass
+            else:
+                alt = dist[u] + get_travel_cost(u, v) #Calculate the alternate cost of getting to node v from node u
+                
+                if alt < dist[v]: #Check if alternate cost is less than dist[v]
+                    dist[v] = alt #Set dist[v] to the new best cost to get there
+                    prev[v] = u #Set prev[v] to the new vertex to use
+                    q_cost.append((v, dist[v])) #Append v onto q_cost with its new cost (dist[v])
+    return prev
+
+def reconstruct_path(prev, goal_vertex):  
+    #Initialize variables
+    path = [goal_vertex]
+    cur_vertex = goal_vertex
+    
+    #While cur_vertex is in prev:
+    while (robot.step(timestep) != -1 and cur_vertex in prev):
+        path.append(prev[cur_vertex]) #Append whatever's in prev[cur_vertex] to the path
+        cur_vertex = prev[cur_vertex] #Set cur_vertex to prev[cur_vertex]
+
+    path.reverse() #Reverse the path so it starts with the original source_vertex
+    
+    return path #Return the final path from the source to the goal vertex
+
+
+def visualize_path(path):
+    global world_map
+    
+    #For each vertex along the path: in the world_map for rendering: 2 = Path, 3 = Goal, 4 = Start
+    for v in path:
+        if (path.index(v) == 0): #Set the start to be 4
+            world_map[v] = 4
+        elif (path.index(v) == len(path)-1): #Set the goal to be 3
+            world_map[v] = 3
+        else: #Set the path to be 6
+            world_map[v] = 6
+    return
+#########################################################################################################
+    
+
 # Update the odometry
 last_odometry_update_time = None
 # robots start location, needs to return to this spot
@@ -181,6 +278,7 @@ while robot.step(timestep) != -1:
     if state == 'start':
         # Should start in a stopped position
         state = 'update_map'
+        # state = 'get_path' #Testing Dijkstra's Algorithm
         
         pass
     if state == 'update_map':
@@ -220,6 +318,18 @@ while robot.step(timestep) != -1:
         state = 'update_map'
         
         pass
+        
+    if state == 'get_path':
+        source_vertex = transform_world_coord_to_map_coord([pose_x,pose_y]) #Set the source vertex
+        goal_vertex = transform_world_coord_to_map_coord([goal_pose[0], goal_pose[1]]) #Set the overall goal vertex
+        
+        prev = dijkstra(source_vertex) #Get prev using Dijkstra's
+        path = reconstruct_path(prev, goal_vertex) #Reconstruct the path using prev
+        visualize_path(path) #Visualize the path on the world map
+        display_map(world_map)
+        
+        pass
+        
     pass
 
 # Enter here exit cleanup code.
