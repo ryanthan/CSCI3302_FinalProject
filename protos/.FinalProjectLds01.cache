@@ -1,0 +1,11 @@
+Webots Proto Cache File version 1.5
+protoFileHash: b0f43bc0770b4ba1ff6e10702ae4fbfa
+needsRobotAncestor: 1
+baseType: Lidar
+slotType: 
+parameters: translation,rotation,name,noise,enablePhysics
+tags: 
+license: 
+licenseUrl: 
+documentationUrl: 
+info: ##\nCSCI\s3302:\sIntroduction\sto\sRobtics\sFall\s2020\nJorge\sOrtiz\sVenegas,\sRyan\sThan,\sSage\sGarrett,\sSarah\sSchwallier,\sWilliam\sCulkin\nMaze\sSearch\s+\sRescue\nRobot\sController.\n##\n
