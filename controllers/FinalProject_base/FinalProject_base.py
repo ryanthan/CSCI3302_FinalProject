@@ -19,7 +19,7 @@ FinalProject_supervisor.init_supervisor()
 robot = FinalProject_supervisor.supervisor
 
 # World Map Variables, based from lab 5
-MAP_BOUNDS_X = [-0.75,0.83] # based on the maze and safe zone upper and lower bounds
+MAP_BOUNDS_X = [-0.7,0.85] # based on the maze and safe zone upper and lower bounds
 MAP_BOUNDS_Y = [0.5,1.5] # based on the maze and safe zone upper and lower bounds
 CELL_RESOLUTIONS = np.array([0.05, 0.05]) # 26 by 20 cells
 NUM_X_CELLS = int((MAP_BOUNDS_X[1]-MAP_BOUNDS_X[0]) / CELL_RESOLUTIONS[0])
@@ -43,10 +43,11 @@ left_wheel_direction = 0
 right_wheel_direction = 0
 EPUCK_MAX_WHEEL_SPEED = 0.12880519 * 10.0
 EPUCK_AXLE_DIAMETER = 0.053 # mm; from lab 4
-OBJECT_AVOIDANCE = 0.1 
+OBJECT_AVOIDANCE = 0.055
 
 # get the time step of the current world, given controller code
 timestep = int(robot.getBasicTimeStep())
+#timestep = 16 #added for debugging
 #print("timestep: ", timestep)
 
 # Update the odometry, based from lab 2 and 4
@@ -84,7 +85,7 @@ lidar_offsets = []
 for i in range(0, LIDAR_ANGLE_BINS):
     angle = LIDAR_ANGLE_RANGE / 2.0 - (i * LIDAR_ANGLE_RANGE / (LIDAR_ANGLE_BINS - 1.0))
     lidar_offsets.append(angle)
-#print(lidar_offsets)
+print(lidar_offsets)
 
 # Take LIDAR readings and convert to world coords, based from lab 4
 def convert_lidar_reading_to_world_coord(lidar_bin, lidar_distance):  
@@ -130,6 +131,9 @@ def update_map(lidar_readings_array):
             #print("map_coord: ", map_coord)
             if(map_coord != None):
                 world_map[map_coord[0],map_coord[1]] = 1
+                print("i LIDAR", i, lidar_readings_array[i])
+                #print("world_coord: ", world_coord)
+                #print("map_coord: ", map_coord)
                 
 # Display the map using the LIDAR findings, based from lab 4 and 5
 def display_map(m):
@@ -142,6 +146,10 @@ def display_map(m):
     if state != 'get_path': #Kept getting an error with these lines when using Dijkstra's so I had to add this if statement
         world_map[goal_pos[0],goal_pos[1]] = 3
         world_map[robot_pos[0],robot_pos[1]] = 4
+    #for row in range(NUM_Y_CELLS-1,-1,-1): #added for debugging
+        #for col in range(NUM_X_CELLS):#added for debugging
+            #if(world_map[row,col] == 1): # Checking for a wall#added for debugging
+               # print("row,col", row,col)#added for debugging
     for row in range(NUM_Y_CELLS-1,-1,-1):
         for col in range(NUM_X_CELLS):
             if(world_map[row,col] == 1): # Checking for a wall
