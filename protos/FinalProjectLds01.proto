@@ -248,7 +248,7 @@ PROTO FinalProjectLds01 [
     }
     %{ end }%
     horizontalResolution 3
-    fieldOfView 1.5708
+    fieldOfView 2.356 #1.5708
     numberOfLayers 1
     near 0.01
     minRange 0.01
