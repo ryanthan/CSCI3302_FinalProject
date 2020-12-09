@@ -3,8 +3,8 @@ WorldInfo {
   coordinateSystem "NUE"
 }
 Viewpoint {
-  orientation -1 0 0 1.54185145210728
-  position 0.008229544605488304 3.365488350085899 -0.024200704238388594
+  orientation -0.999975120067072 0.0049759495751316414 0.004999917266383102 1.5756263320609687
+  position 0.0034569413060431264 3.3650660640369137 -0.09169006462233104
 }
 TexturedBackground {
 }
@@ -214,6 +214,20 @@ Solid {
   ]
   name "wall9"
   boundingObject USE WALL9
+}
+Solid {
+  translation 0.6 0.05 -0.3
+  children [
+    DEF WALL10 Shape {
+      appearance PBRAppearance {
+      }
+      geometry Box {
+        size 0.2 0.1 0.01
+      }
+    }
+  ]
+  name "wall10"
+  boundingObject USE WALL10
 }
 DEF EPUCK E-puck {
   translation -0.46 -2.98829e-05 0.38
