@@ -1,5 +1,6 @@
 """
 CSCI 3302: Introduction to Robtics Fall 2020
+Jorge Ortiz Venegas, Ryan Than, Sage Garrett, Sarah Schwallier, William Culkin
 Maze Search + Rescue 
 Robot Controller.
 """
