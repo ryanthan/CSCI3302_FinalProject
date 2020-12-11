@@ -394,10 +394,10 @@ while robot.step(timestep) != -1:
                 leftMotor.setVelocity(left_wheel_direction)
                 rightMotor.setVelocity(right_wheel_direction)
                 turning = False
-                turnDirection = None
+
                 if turnDirection == 'right':
-                    #print(direction)
-                    if world_map[checkForRightWall[0], checkForRightWall[1]] == 1 or world_map[checkForRightWall2[0], checkForRightWall2[1]] == 1:
+                    print(direction)
+                    if world_map[checkForRightWall[0], checkForRightWall[1]] == 0 or world_map[checkForRightWall2[0], checkForRightWall2[1]] == 0:
                         turning = True
                         turnDirection = 'right'
 
@@ -409,12 +409,20 @@ while robot.step(timestep) != -1:
                 rightMotor.setVelocity(right_wheel_direction)
             else:
                 left_wheel_direction = EPUCK_MAX_WHEEL_SPEED
-                right_wheel_direction = .3 * EPUCK_MAX_WHEEL_SPEED
+                right_wheel_direction = 0 * EPUCK_MAX_WHEEL_SPEED
                 leftMotor.setVelocity(left_wheel_direction)
-                rightMotor.setVelocity(.3 * right_wheel_direction)
+                rightMotor.setVelocity(0 * right_wheel_direction)
 
 
-
+         elif world_map[checkForRightWall2[0], checkForRightWall2[1]] == 0 and firstContact:
+            #print(checkForRightWall, checkForRightWall2)
+            #print(robot_pos)
+            #print(world_map[checkForRightWall[0], checkForRightWall[1]])
+            #print(world_map[checkForRightWall2[0], checkForRightWall2[1]])
+            #print(firstContact)
+            turning = True
+            turnDirection = 'right'
+            direction,headingFront,headingFront2,headingRight,headingRight2 = update_heading(direction, 'right')
 
         elif world_map[checkForInfront2[0], checkForInfront2[1]] == 1:
             #print(checkForInfront,checkForInfront2)
@@ -427,15 +435,7 @@ while robot.step(timestep) != -1:
             turningTo = direction
 
 
-        elif world_map[checkForRightWall2[0], checkForRightWall2[1]] == 0 and firstContact:
-            #print(checkForRightWall, checkForRightWall2)
-            #print(robot_pos)
-            #print(world_map[checkForRightWall[0], checkForRightWall[1]])
-            #print(world_map[checkForRightWall2[0], checkForRightWall2[1]])
-            #print(firstContact)
-            turning = True
-            turnDirection = 'right'
-            direction,headingFront,headingFront2,headingRight,headingRight2 = update_heading(direction, 'right')
+       
 
 
 
